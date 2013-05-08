@@ -1,0 +1,11 @@
+
+SELECT actor_attributes.location,
+COUNT (*) num_users
+FROM publicdata:samples.github_nested
+WHERE
+  (actor_attributes.location IS NOT NULL) AND
+  (actor_attributes.location != '')
+GROUP BY actor_attributes.location
+HAVING
+  (COUNT(*) >= 1)
+ORDER BY num_users DESC;

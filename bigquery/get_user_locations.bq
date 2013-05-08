@@ -1,3 +1,0 @@
-
-SELECT actor_attributes.location FROM publicdata:samples.github_nested
-WHERE actor_attributes.location IS NOT NULL;
