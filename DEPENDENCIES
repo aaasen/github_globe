@@ -1,0 +1,11 @@
+bigquery==2.0.12
+google-api-python-client==1.0
+google-apputils==0.3.0
+httplib2==0.8
+oauth2client==1.0
+python-dateutil==1.5
+python-gflags==2.0
+pytz==2013b
+requests==1.2.0
+requests-cache==0.4.0
+wsgiref==0.1.2

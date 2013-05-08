@@ -1,7 +1,10 @@
 
 import requests
+import requests_cache
 
 maps_api_endpoint = 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
+
+requests_cache.install_cache('cache/coords_cache')
 
 class FetchError(Exception):
     def __init__(self, resp):
