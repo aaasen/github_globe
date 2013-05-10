@@ -56,8 +56,23 @@ def bulk_address_to_coords(data):
 
     return data
 
+def normalize_magnitudes(data):
+    max = 22000.0;
+    
+    for x in data:
+        x['num_users'] = float(x['num_users']) / max
 
-data = bulk_address_to_coords(fetch_loc_data())
+    return data
 
-with open('../visualize/user_locations.json', 'w') as f:
-    f.write(json.dumps(data))
+def to_globe_format(data):
+    data = map(lambda x: [x['coords']['lat'], x['coords']['lng'], x['num_users']], data)
+    data = [item for sublist in data for item in sublist]
+    data = map(lambda x: float(x), data)
+    return data
+
+data = normalize_magnitudes(bulk_address_to_coords(fetch_loc_data()))
+data_globe_format = to_globe_format(data)
+data_globe_format = [["now",data_globe_format]]
+
+with open('../visualize/globe/user_locations.json', 'w') as f:
+    f.write(json.dumps(data_globe_format))
