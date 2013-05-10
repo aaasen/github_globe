@@ -44,17 +44,23 @@ def address_to_coords(loc):
     else:
         raise FetchError(resp)
 
-    print 'address done'
+    print 'address null!'
+    return None
 
 def bulk_address_to_coords(data):
-    data = data[:10]
     data = filter(lambda x: type(x) is dict, data)
+    length = len(data)
+    new = []
 
-    for x in data:
-        x['coords'] = address_to_coords(x['actor_attributes_location'])
-        del x['actor_attributes_location']
+    for x in xrange(len(data)):
+        print('processing %s out of %s' % (x, length))
+        coords = address_to_coords(data[x]['actor_attributes_location'])
+        if coords is not None:
+            data[x]['coords'] = coords
+            del data[x]['actor_attributes_location']
+            new.append(data[x])
 
-    return data
+    return new
 
 def normalize_magnitudes(data):
     max = 22000.0;
