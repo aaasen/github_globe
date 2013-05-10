@@ -63,10 +63,11 @@ def bulk_address_to_coords(data):
     return new
 
 def normalize_magnitudes(data):
-    max = 22000.0;
+    tmp = map(lambda x: float(x['num_users']), data)
+    max_pop = max(tmp)
     
     for x in data:
-        x['num_users'] = float(x['num_users']) / max
+        x['num_users'] = float(x['num_users']) / max_pop
 
     return data
 
