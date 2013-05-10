@@ -59,5 +59,5 @@ def bulk_address_to_coords(data):
 
 data = bulk_address_to_coords(fetch_loc_data())
 
-with open('user_locations.json', 'w') as f:
+with open('../visualize/user_locations.json', 'w') as f:
     f.write(json.dumps(data))
