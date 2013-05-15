@@ -3,58 +3,47 @@ import requests
 import requests_cache
 import json
 
-requests_cache.install_cache('cache/coords_cache')
+import fetch_error
+import geocode
 
-maps_api_endpoint = 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
+requests_cache.install_cache('cache/loc_cache')
+
 loc_data_endpoint = 'http://commondatastorage.googleapis.com/github_globe/location_frequencies'
-
-class FetchError(Exception):
-    def __init__(self, resp):
-        self.resp = resp
-
-    def __str__(self):
-        return '%s returned invalid status code %s' % (self.resp.url, self.resp.status_code)
 
 def safe_json_loads(string):
     try:
-        return json.loads(string.encode('utf-8'))
-    except:
+        string = string.replace('\n', '')
+        return json.loads(string)
+    except ValueError:
+        print('error: %s' % string.encode('utf-8'))
         return None
 
-def fetch_loc_data():
+def fetch_data():
     resp = requests.get(loc_data_endpoint)
-    print 'request done'
 
     if resp.status_code == requests.codes.ok:
-        locs = resp.text.split()
-        json_locs = map(lambda x: safe_json_loads(x), locs)
-        return filter(lambda x: x is not None, json_locs)
-
+        return resp.text
     else:
         raise FetchError(resp)
 
-def address_to_coords(loc):
-    resp = requests.get(maps_api_endpoint % loc)
-    
-    if resp.status_code == requests.codes.ok:
-        results = resp.json()['results']
+def format_data(raw):
+    print 'format_data'
+    locs = raw.split('}\n{')[:1000]
+    locs = map(lambda x: x + '}', locs)
+    locs = map(lambda x: '{' + x, locs)
+    locs[0] = locs[0].replace('{{', '{')
+    locs[-1] = locs[-1].replace('{{', '{')
+    json_locs = map(lambda x: safe_json_loads(x), locs)
+    return filter(lambda x: x is not None, json_locs)
 
-        if len(results) > 0:
-            return results[0]['geometry']['location']
-    else:
-        raise FetchError(resp)
-
-    print 'address null!'
-    return None
-
-def bulk_address_to_coords(data):
+def add_coords(data):
     data = filter(lambda x: type(x) is dict, data)
     length = len(data)
     new = []
 
     for x in xrange(len(data)):
         print('processing %s out of %s' % (x, length))
-        coords = address_to_coords(data[x]['actor_attributes_location'])
+        coords = geocode.address_to_coords(data[x]['actor_attributes_location'])
         if coords is not None:
             data[x]['coords'] = coords
             del data[x]['actor_attributes_location']
@@ -77,7 +66,7 @@ def to_globe_format(data):
     data = map(lambda x: float(x), data)
     return data
 
-data = normalize_magnitudes(bulk_address_to_coords(fetch_loc_data()))
+data = normalize_magnitudes(add_coords(format_data(fetch_data())))
 data_globe_format = to_globe_format(data)
 data_globe_format = [["now",data_globe_format]]
 
