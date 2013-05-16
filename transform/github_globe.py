@@ -5,18 +5,27 @@ import json
 
 import fetch_error
 import geocode
+from geo_coord import GeoCoord
 
 requests_cache.install_cache('cache/loc_cache')
 
 loc_data_endpoint = 'http://commondatastorage.googleapis.com/github_globe/location_frequencies'
 
-def safe_json_loads(string):
+def _safe_json_loads(string):
     try:
-        string = string.replace('\n', '')
+        print string
         return json.loads(string)
-    except ValueError:
-        print('error: %s' % string.encode('utf-8'))
+    except TypeError:
         return None
+
+def _extract_json(text, max_values=None, delimiter='\n'):
+    data = text.split('}%s{' % delimiter)[:max_values]
+    data = map(lambda x: '{%s}' % x, data)
+
+    data[0] = data[0].replace('{{', '{')
+    data[-1] = data[-1].replace('}}', '}')
+
+    return map(lambda x: json.loads(x), data)
 
 def fetch_data():
     resp = requests.get(loc_data_endpoint)
@@ -27,14 +36,8 @@ def fetch_data():
         raise FetchError(resp)
 
 def format_data(raw):
-    print 'format_data'
-    locs = raw.split('}\n{')[:1000]
-    locs = map(lambda x: x + '}', locs)
-    locs = map(lambda x: '{' + x, locs)
-    locs[0] = locs[0].replace('{{', '{')
-    locs[-1] = locs[-1].replace('{{', '{')
-    json_locs = map(lambda x: safe_json_loads(x), locs)
-    return filter(lambda x: x is not None, json_locs)
+    locs = _extract_json(raw, max_values=1000)
+    return filter(lambda x: x is not None, locs)
 
 def add_coords(data):
     data = filter(lambda x: type(x) is dict, data)
@@ -45,28 +48,45 @@ def add_coords(data):
         print('processing %s out of %s' % (x, length))
         coords = geocode.address_to_coords(data[x]['actor_attributes_location'])
         if coords is not None:
+            coords = GeoCoord(coords['lat'], coords['lng'])
             data[x]['coords'] = coords
             del data[x]['actor_attributes_location']
             new.append(data[x])
 
     return new
 
+def combine_duplicates(data):
+    new = {}
+
+    for el in data:
+        el['coords'] = el['coords'].round(2)
+        if el['coords'] in new:
+            new[el['coords']] += int(el['num_users'])
+        else:
+            new[el['coords']] = int(el['num_users'])
+
+    return new
+
 def normalize_magnitudes(data):
-    tmp = map(lambda x: float(x['num_users']), data)
-    max_pop = max(tmp)
+    max_pop = max(data.values())
     
-    for x in data:
-        x['num_users'] = float(x['num_users']) / max_pop
+    for x in data.keys():
+        data[x] = float(data[x]) / max_pop
 
     return data
 
 def to_globe_format(data):
-    data = map(lambda x: [x['coords']['lat'], x['coords']['lng'], x['num_users']], data)
+    data = map(lambda x: [x.lat, x.lng, data[x]], data.keys())
     data = [item for sublist in data for item in sublist]
     data = map(lambda x: float(x), data)
     return data
 
-data = normalize_magnitudes(add_coords(format_data(fetch_data())))
+data = normalize_magnitudes(
+    combine_duplicates(
+    add_coords(
+    format_data(
+    fetch_data()))))
+
 data_globe_format = to_globe_format(data)
 data_globe_format = [["now",data_globe_format]]
 
