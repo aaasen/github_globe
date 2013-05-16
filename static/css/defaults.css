@@ -1,0 +1,125 @@
+
+@import url("http://fonts.googleapis.com/css?family=Bitter:700");
+@import url("http://fonts.googleapis.com/css?family=Lato:400,900");
+@import url("http://fonts.googleapis.com/css?family=Inconsolata");
+@import url("http://fonts.googleapis.com/css?family=Merriweather+Sans:400");
+
+body {
+	font-family: "Lato", "Open Sans", helvetica, sans-serif;
+	font-size: 16px;
+	color: rgba(0, 0, 0, 0.9);
+	background-color: white;
+}
+
+p {
+	margin: 16px 0px;
+	line-height: 1.5em;
+}
+
+hr {
+	border: 0px;
+	height: 1px;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+code {
+	font-family: "Inconsolata", courier, monospace;
+	padding: 0px 4px;
+	color: rgb(0, 112, 32);
+	background-color: rgba(0, 0, 0, 0.02);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+	font-size: 14px;
+}
+
+pre {
+	overflow-x: auto;
+	padding: 0px 4px;
+	line-height: 0.8em;
+	padding: 6px 12px;
+	background-color: rgba(0, 0, 0, 0.02);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+	margin-bottom: 16px;
+}
+
+pre > code {
+	color: rgba(0, 0, 0, 0.9);
+	font-size: 14px;
+	padding: 0px;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	line-height: 1.2em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: bold;
+	line-height: 2em;
+}
+
+h1 {
+	font-size: 22px;
+}
+
+h2 {
+	font-size: 20px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+	font-size: 18px;
+}
+
+h4 {
+	font-size: 16px;
+}
+
+h5 {
+	font-size: 14px;
+}
+
+h6 {
+	font-size: 12px;
+	color: rgba(0, 0, 0, 0.9);
+}
+
+ol {
+	list-style: decimal outside none;
+	padding-left: 32px;
+	line-height: 1.5em;
+}
+
+ul {
+	list-style: circle inside none;
+	padding-left: 32px;
+	line-height: 1.5em;
+}
+
+blockquote {
+	padding-left: 16px;
+	border-left: 2px solid rgba(0, 112, 32, 0.8);
+	color: rgba(0, 0, 0, 0.4);
+}
+
+em {
+	font-style: italic;
+}
+
+strong {
+	font-weight: bold;
+}
+
+small {
+	font-size: 12px;
+	font-weight: bold;
+	color: rgba(0, 0, 0, 0.2);
+}
+
+a {
+	color: rgb(14, 132, 181);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
