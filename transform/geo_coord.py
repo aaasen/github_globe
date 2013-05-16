@@ -1,4 +1,6 @@
 
+"""A container for geographic coordinates (latitude and longitude)"""
+
 class GeoCoord:
     def __init__(self, lat, lng):
         self.lat = lat
