@@ -11,14 +11,15 @@ All data is provided by [GitHub Archive](http://www.githubarchive.org/)
 and fetched via [Google BigQuery](https://developers.google.com/bigquery/).
 
 Locations are provided by approximately 1 million of the 4 million GitHub users.
-They are provided in an informal syntax with varying specificity.
+They are written in an informal syntax with varying specificity.
 For example, `Seattle`, `Seattle, WA` and `United States` are all valid.
 
 The 1,000 most common locations are passed through the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/)
 and transformed into geographical coordinates.
 
 Data is then grouped by coordinates, so `San Francisco`, `San Francisco, CA`, and `San Fran` are combined.
-This data is then transformed into the WebGL Globe format and plotted.
+
+Finally, data is plotted on the [WebGL Globe](http://code.google.com/p/webgl-globe/).
 
 ## Anatomy of the Repo
 
