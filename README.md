@@ -1,69 +1,40 @@
-The **WebGL Globe** is an open platform for visualizing geographic
-information in WebGL enabled browsers.
-It supports data in JSON format, a sample of which you can find [here]
-(https://github.com/dataarts/dat.globe/raw/master/globe/population909500.json). dat.globe makes heavy use of the [Three.js](https://github.com/mrdoob/three.js/)
-library, and is still in early open development.
+# Github Globe
 
+This is a little visualization of Github users throughout the world.
+Check out an interactive version at [http://aasen.in/github_globe](http://aasen.in/github_globe)
 
-### Data Format ###
+![github users plotted on a globe](http://i.imgur.com/wHeJ9wG.png)
 
-The following illustrates the JSON data format that the globe expects:
+## Creating the Visualization
 
-```javascript
-var data = [
-  [
-    'seriesA', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
-  ],
-  [
-    'seriesB', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
-  ]
-];
-```
+All data is provided by [GitHub Archive](http://www.githubarchive.org/)
+and fetched via [Google BigQuery](https://developers.google.com/bigquery/).
 
-### Basic Usage ###
+Locations are provided by approximately 1 million of the 4 million GitHub users.
+They are written in an informal syntax with varying specificity.
+For example, `Seattle`, `Seattle, WA` and `United States` are all valid.
 
-The following code polls a JSON file (formatted like the one above)
-for geo-data and adds it to an animated, interactive WebGL globe.
+The 1,000 most common locations are passed through the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/)
+and transformed into geographical coordinates.
 
-```javascript
-// Where to put the globe?
-var container = document.getElementById( 'container' );
+Data is then grouped by coordinates, so `San Francisco`, `San Francisco, CA`, and `San Fran` are combined.
 
-// Make the globe
-var globe = new DAT.Globe( container );
+Finally, data is plotted on the [WebGL Globe](http://code.google.com/p/webgl-globe/).
 
-// We're going to ask a file for the JSON data.
-xhr = new XMLHttpRequest();
+## Anatomy of the Repo
 
-// Where do we get the data?
-xhr.open( 'GET', 'myjson.json', true );
+All queries are stored in `master/fetch`.
 
-// What do we do when we have it?
-xhr.onreadystatechange = function() {
+Code to transform the data is in `master/transform`.
 
-  // If we've received the data
-  if ( xhr.readyState === 4 && xhr.status === 200 ) {
+The visualization and WebGL globe are stored in the `gh-pages` branch.
 
-      // Parse the JSON
-      var data = JSON.parse( xhr.responseText );
+## Problems
 
-      // Tell the globe about your JSON data
-      for ( i = 0; i < data.length; i++ ) {
-        globe.addData( data[i][1], 'magnitude', data[i][0] );
-      }
+One problem is that locations vary in specificity.
+Many people report only their country and leave out states, cities, and other identifiers.
 
-      // Create the geometry
-      globe.createPoints();
-
-      // Begin animation
-      globe.animate();
-
-    }
-
-  }
-
-};
-
-// Begin request
-xhr.send( null );
-```
+To solve this, I could calculate the specificity of an address and leave out any broad locations
+like `China`, `America`, and `California`.
+However, since this would skew the data I decided not to.
+If you disagree, [fork it](http://github.com/aaasen/github_globe/fork)!
